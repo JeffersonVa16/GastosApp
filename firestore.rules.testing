@@ -1,0 +1,25 @@
+// ⚠️ REGLAS DE FIRESTORE PARA PRUEBAS
+// ⚠️ ESTAS REGLAS SON PERMISIVAS Y SOLO DEBEN USARSE TEMPORALMENTE PARA DIAGNOSTICAR PROBLEMAS
+// ⚠️ USA firestore.rules (sin .testing) PARA PRODUCCIÓN
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Permitir todo a usuarios autenticados (SOLO PARA PRUEBAS)
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+
+// INSTRUCCIONES:
+// 1. Ve a Firebase Console (https://console.firebase.google.com)
+// 2. Selecciona tu proyecto: gastosapp-74686
+// 3. Ve a Firestore Database → Rules (Reglas)
+// 4. Copia y pega este contenido completo
+// 5. Haz clic en "Publicar" (Publish)
+// 6. Intenta guardar un gasto en la app
+// 
+// Si funciona con estas reglas, el problema son las reglas de seguridad.
+// Luego usa las reglas del archivo firestore.rules (el original) en producción.
+
