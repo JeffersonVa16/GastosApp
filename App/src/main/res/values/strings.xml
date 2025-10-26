@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Control de Gastos</string>
+    <string name="login">Iniciar Sesión</string>
+    <string name="register">Registrarse</string>
+    <string name="email">Correo electrónico</string>
+    <string name="password">Contraseña</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="add_expense">Agregar Gasto</string>
+    <string name="edit_expense">Editar Gasto</string>
+    <string name="expense_name">Nombre del gasto</string>
+    <string name="amount">Monto</string>
+    <string name="category">Categoría</string>
+    <string name="date">Fecha</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="delete">Eliminar</string>
+    <string name="total_monthly">Total del mes actual</string>
+    <string name="filter">Filtrar</string>
+    <string name="clear_filters">Limpiar filtros</string>
+</resources>
