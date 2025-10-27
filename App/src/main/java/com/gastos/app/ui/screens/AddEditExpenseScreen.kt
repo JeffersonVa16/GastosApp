@@ -51,20 +51,31 @@ fun AddEditExpenseScreen(
     
     // Observar el estado de la operación
     LaunchedEffect(expenseState) {
+        android.util.Log.d("AddEditExpenseScreen", "Estado cambió a: $expenseState")
         when (expenseState) {
             is ExpenseState.Success -> {
+                android.util.Log.d("AddEditExpenseScreen", "Mostrando toast de éxito")
                 Toast.makeText(context, "✅ Gasto guardado exitosamente", Toast.LENGTH_SHORT).show()
-                expenseViewModel.resetExpenseState()
+                kotlinx.coroutines.delay(300) // Pequeña demora para que el toast sea visible
+                android.util.Log.d("AddEditExpenseScreen", "Navegando hacia atrás")
                 onNavigateBack()
+                expenseViewModel.resetExpenseState()
             }
             is ExpenseState.Error -> {
+                android.util.Log.e("AddEditExpenseScreen", "Error: ${(expenseState as ExpenseState.Error).message}")
                 Toast.makeText(
                     context,
                     "❌ Error: ${(expenseState as ExpenseState.Error).message}",
                     Toast.LENGTH_LONG
                 ).show()
+                expenseViewModel.resetExpenseState()
             }
-            else -> {}
+            is ExpenseState.Loading -> {
+                android.util.Log.d("AddEditExpenseScreen", "Cargando...")
+            }
+            is ExpenseState.Idle -> {
+                android.util.Log.d("AddEditExpenseScreen", "Estado Idle")
+            }
         }
     }
     
@@ -330,9 +341,6 @@ fun AddEditExpenseScreen(
             // Botón de guardar
             Button(
                 onClick = {
-                    // Limpiar estado previo
-                    expenseViewModel.resetExpenseState()
-                    
                     // Validaciones
                     nameError = name.isBlank()
                     val amountDouble = amount.toDoubleOrNull()
@@ -370,10 +378,21 @@ fun AddEditExpenseScreen(
                 )
             ) {
                 if (expenseState is ExpenseState.Loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = "Guardando...",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 } else {
                     Row(
                         horizontalArrangement = Arrangement.Center,
@@ -392,6 +411,27 @@ fun AddEditExpenseScreen(
                             fontWeight = FontWeight.Bold
                         )
                     }
+                }
+            }
+            
+            // Botón de cancelar cuando está cargando
+            if (expenseState is ExpenseState.Loading) {
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedButton(
+                    onClick = {
+                        expenseViewModel.resetExpenseState()
+                        onNavigateBack()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Text(
+                        text = "Cancelar",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
             
