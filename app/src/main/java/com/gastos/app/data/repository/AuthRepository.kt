@@ -3,6 +3,7 @@ package com.gastos.app.data.repository
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
+import android.util.Log
 import com.gastos.app.data.model.UserProfile
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
@@ -67,7 +68,7 @@ class AuthRepository(private val context: Context) {
                 .setGoogleIdTokenRequestOptions(
                     BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                         .setSupported(true)
-                        .setServerClientId("271969868917-udr7550amsvtfm58pabcqlaf1vcktcqj.apps.googleusercontent.com")
+                        .setServerClientId("534415797759-sfv4bv4ckcu8nrv3fa1t5q9sds0oa59i.apps.googleusercontent.com")
                         .setFilterByAuthorizedAccounts(false)
                         .build()
                 )
@@ -84,23 +85,36 @@ class AuthRepository(private val context: Context) {
     // Completar login con Google usando el resultado del intent
     suspend fun signInWithGoogle(intent: Intent): Result<UserProfile> {
         return try {
+            Log.d("AuthRepository", "=== INICIANDO LOGIN CON GOOGLE ===")
+            
+            Log.d("AuthRepository", "📱 Obteniendo credenciales del intent...")
             val credential = oneTapClient.getSignInCredentialFromIntent(intent)
             val googleIdToken = credential.googleIdToken
             
+            Log.d("AuthRepository", "🔑 Token recibido: ${googleIdToken?.take(20)}...")
+            
             if (googleIdToken != null) {
+                Log.d("AuthRepository", "🌐 Autenticando con Firebase...")
                 val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
                 val result = auth.signInWithCredential(firebaseCredential).await()
                 val user = result.user
                 
                 if (user != null) {
+                    Log.d("AuthRepository", "✅ Login exitoso: ${user.email}")
                     Result.success(UserProfile.fromFirebaseUser(user))
                 } else {
+                    Log.e("AuthRepository", "❌ Usuario nulo después del login")
                     Result.failure(Exception("Error al iniciar sesión con Google"))
                 }
             } else {
+                Log.e("AuthRepository", "❌ No se obtuvo el token de Google")
                 Result.failure(Exception("No se obtuvo el token de Google"))
             }
+        } catch (e: com.google.firebase.FirebaseException) {
+            Log.e("AuthRepository", "❌ Error de Firebase en Google Sign-In: ${e.message}", e)
+            Result.failure(Exception("Error de Firebase: ${e.message}. Verifica tu conexión."))
         } catch (e: Exception) {
+            Log.e("AuthRepository", "❌ Error en Google Sign-In: ${e.message}", e)
             Result.failure(e)
         }
     }

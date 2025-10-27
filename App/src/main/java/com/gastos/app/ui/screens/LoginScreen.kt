@@ -290,6 +290,11 @@ fun LoginScreen(
                 )
             }
             
+            // NOTA: Google Sign-In deshabilitado temporalmente
+            // debido a problemas con Google Play Services en el emulador
+            // Para habilitarlo, usa un dispositivo físico o un emulador con Google Play
+            
+            /* 
             // Divider
             Row(
                 modifier = Modifier
@@ -327,6 +332,7 @@ fun LoginScreen(
                     fontSize = 16.sp
                 )
             }
+            */
             
             // Mensaje de error
             if (authState is AuthState.Error) {
